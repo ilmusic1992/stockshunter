@@ -116,6 +116,7 @@ body {
 
 /* ── AUTH SCREENS ── */
 .auth-wrap {
+  display: flex;
   width: 100%;
   min-height: 100%;
   align-items: center;
@@ -123,6 +124,16 @@ body {
   background: var(--bg);
   position: relative;
   overflow: hidden;
+}
+
+.auth-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: .3;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .auth-card {
@@ -2001,6 +2012,8 @@ window.doLogout = async () => {
   _unsubs.forEach(u=>u&&u()); _unsubs=[];
   await signOut(auth);
 };
+
+setLogoAll(); // לוגו גם במסכי התחברות/המתנה
 
 onAuthStateChanged(auth, async user => {
   if(!user){ showScreen('sc-login'); return; }
