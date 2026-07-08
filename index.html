@@ -17,9 +17,9 @@
 ═══════════════════════════════════════ */
 
 :root {
-  /* Backgrounds — IDT clean light */
-  --bg: #ffffff;
-  --bg2: #f9fafb;
+  /* Backgrounds — v5 layered light */
+  --bg: #f6f7f9;
+  --bg2: #f0f1f4;
   --s: #ffffff;
   --s2: #f3f4f6;
 
@@ -58,13 +58,13 @@
   /* Shadows (no glow) */
   --glow-cyan: none;
   --glow-blue: none;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow: 0 1px 2px rgba(16,24,40,0.04), 0 4px 16px rgba(16,24,40,0.05);
+  --shadow-lg: 0 8px 32px rgba(16,24,40,0.10);
 
   /* Shape */
-  --r: 8px;
-  --rl: 12px;
-  --rxl: 16px;
+  --r: 10px;
+  --rl: 16px;
+  --rxl: 20px;
 
   /* Layout */
   --topbar-h: 56px;
@@ -97,6 +97,8 @@ body {
 
 /* ── SCREENS ── */
 .screen { display: none; width: 100%; height: 100%; position: relative; z-index: 1; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.page.active { animation: fadeUp .25s ease; }
 .screen.active { display: flex; }
 
 /* ── LOADING ── */
@@ -229,11 +231,12 @@ body {
   background: rgba(255,255,255,0.95);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid rgba(16,24,40,0.06);
   height: var(--topbar-h);
   display: flex;
   align-items: center;
-  padding: 0 1.5rem;
+  gap: 4px;
+  padding: 0 1.25rem;
   flex-shrink: 0;
   z-index: 10;
 }
@@ -243,26 +246,22 @@ body {
 .ni {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 0 10px;
-  height: var(--topbar-h);
-  font-size: 12px;
-  font-weight: 500;
+  gap: 6px;
+  padding: 8px 13px;
+  height: auto;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--m);
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
   white-space: nowrap;
-  border-top: none;
-  border-left: none;
-  border-right: none;
+  border: none;
   background: none;
   font-family: inherit;
-  transition: all .2s;
-  letter-spacing: .02em;
+  transition: background .15s ease, color .15s ease;
 }
-.ni:hover { color: var(--t2); }
-.ni.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+.ni:hover { color: var(--t); background: var(--s2); }
+.ni.active { color: var(--cyan2); background: var(--cbg); }
 .ni i { font-size: 14px; }
 
 .av {
@@ -326,75 +325,79 @@ body {
   flex: 1;
   max-width: 70px;
 }
-.bn-item i { font-size: 20px; }
-.bn-item span { font-size: 9px; font-weight: 500; letter-spacing: .03em; }
-.bn-item.active { color: var(--cyan); }
-.bn-item.active i { filter: drop-shadow(0 0 6px rgba(22,163,74,0.5)); }
+.bn-item i { font-size: 21px; }
+.bn-item span { font-size: 10px; font-weight: 600; }
+.bn-item.active { color: var(--cyan2); }
+.bn-item:active { transform: scale(.94); }
 
 /* ── CARDS ── */
 .card {
-  background: rgba(255,255,255,0.97);
-  border: 1px solid #f3f4f6;
+  background: #ffffff;
+  border: 1px solid rgba(16,24,40,0.05);
   border-radius: var(--rl);
-  padding: 1rem 1.25rem;
-  margin-bottom: 12px;
-  backdrop-filter: blur(12px);
+  padding: 20px 22px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
   position: relative;
   overflow: hidden;
   transition: transform .2s, box-shadow .2s;
 }
-.card:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+.card:hover { box-shadow: var(--shadow); }
 
 /* shimmer הוסר — עיצוב נקי */
+details.card > summary::-webkit-details-marker { display: none; }
+details.card[open] > summary .ti-chevron-down { transform: rotate(180deg); }
+details.card > summary .ti-chevron-down { transition: transform .2s ease; }
 
 /* ── METRICS ── */
 .metric {
-  background: rgba(255,255,255,0.97);
-  border: 1px solid #f3f4f6;
+  background: #ffffff;
+  border: 1px solid rgba(16,24,40,0.05);
   border-radius: var(--rl);
-  padding: 14px 16px;
-  position: relative;
-  overflow: hidden;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+  transition: box-shadow .2s ease, transform .2s ease;
 }
-.metric::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(22,163,74,0.3), transparent);
-}
-.ml { font-size: 10px; color: var(--m); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .08em; font-weight: 500; }
-.mv { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; font-family: 'Heebo', sans-serif; }
-.ms { font-size: 10px; color: var(--h); margin-top: 3px; }
+.metric:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.ml { font-size: 12px; color: var(--m); margin-bottom: 6px; font-weight: 500; }
+.mv { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.5px; color: var(--t); }
+.mv.vb, .mv.vg { color: var(--t); }  /* צבע רק לאזהרות */
+.mv.va { color: var(--gold); }
+.mv.vr { color: var(--red); }
+.ms { font-size: 11px; color: var(--h); margin-top: 4px; }
 
 /* ── BUTTONS ── */
 .btn {
-  padding: 7px 14px;
+  padding: 9px 16px;
   font-size: 13px;
-  font-weight: 500;
-  border: 1px solid rgba(0,0,0,0.07);
-  border-radius: var(--r);
-  background: rgba(0,0,0,0.02);
+  font-weight: 600;
+  border: 1px solid rgba(16,24,40,0.08);
+  border-radius: 10px;
+  background: #ffffff;
   cursor: pointer;
   color: var(--t2);
   font-family: inherit;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: all .2s;
+  transition: background .15s ease, transform .1s ease, box-shadow .15s ease;
   white-space: nowrap;
   -webkit-tap-highlight-color: transparent;
 }
 .btn:hover { background: rgba(22,163,74,0.06); border-color: rgba(22,163,74,0.25); color: var(--t); }
+.btn:active { transform: scale(.97); }
+.btn:hover { background: var(--s2); }
 .btn:active { transform: scale(.97); }
 .btn-gold {
   background: var(--green);
   color: #ffffff;
   border: none;
   font-weight: 700;
-  box-shadow: var(--shadow);
+  box-shadow: 0 2px 8px rgba(22,163,74,0.25);
 }
 .btn-gold:hover { background: var(--cyan2); }
+.btn-gold:active { transform: scale(.97); }
+:is(button, a, input, select, textarea):focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 .btn-sm { padding: 5px 10px; font-size: 11px; }
 .btn-danger { color: var(--red); border-color: rgba(220,38,38,0.25); }
 .btn-danger:hover { background: rgba(220,38,38,0.08); }
@@ -404,11 +407,11 @@ input[type=text], input[type=number], input[type=email],
 input[type=date], input[type=time], input[type=month],
 input[type=password], input[type=file], select, textarea {
   width: 100%;
-  padding: 10px 12px;
+  padding: 11px 14px;
   font-size: 14px;
-  border: 1px solid #e5e7eb;
-  border-radius: var(--r);
-  background: rgba(255,255,255,0.95);
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  background: var(--s2);
   color: var(--t);
   font-family: inherit;
   direction: rtl;
@@ -418,18 +421,22 @@ input[type=password], input[type=file], select, textarea {
   appearance: none;
 }
 input:focus, select:focus, textarea:focus {
-  border-color: var(--cyan);
-  box-shadow: 0 0 0 3px rgba(22,163,74,0.1);
+  border-color: var(--green);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(22,163,74,0.08);
 }
 select option { background: var(--s2); }
 textarea { resize: vertical; min-height: 72px; }
 
-.fl { font-size: 12px; color: var(--m); margin-bottom: 5px; display: block; font-weight: 500; }
+.fl { font-size: 12.5px; color: var(--t2); margin-bottom: 6px; display: block; font-weight: 600; }
 .fr { margin-bottom: 12px; }
 .tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
+.row { transition: background .15s ease; border-radius: 10px; }
+.row:hover { background: var(--bg2); }
+
 /* ── BADGES ── */
-.badge { font-size: 10px; padding: 3px 8px; border-radius: 6px; font-weight: 600; white-space: nowrap; }
+.badge { font-size: 11px; padding: 3px 10px; border-radius: 99px; font-weight: 600; white-space: nowrap; }
 .bg { background: rgba(22,163,74,0.1); color: var(--green); border: 1px solid rgba(22,163,74,0.2); }
 .ba { background: rgba(217,119,6,0.08); color: var(--gold); border: 1px solid rgba(217,119,6,0.2); }
 .br { background: rgba(220,38,38,0.1); color: var(--red); border: 1px solid rgba(220,38,38,0.2); }
@@ -453,8 +460,8 @@ textarea { resize: vertical; min-height: 72px; }
   flex-wrap: wrap;
   gap: 10px;
 }
-.ph-h { font-size: 20px; font-weight: 700; color: var(--t); letter-spacing: -.3px; font-family: 'Heebo', sans-serif; }
-.ph-s { font-size: 12px; color: var(--m); margin-top: 2px; }
+.ph-h { font-size: 24px; font-weight: 800; color: var(--t); letter-spacing: -.5px; }
+.ph-s { font-size: 13px; color: var(--m); margin-top: 3px; }
 
 .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
 .g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
@@ -484,10 +491,10 @@ textarea { resize: vertical; min-height: 72px; }
 }
 
 .ct {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--m);
-  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--t);
+  margin-bottom: 14px;
   text-transform: uppercase;
   letter-spacing: .08em;
   display: flex;
@@ -497,8 +504,8 @@ textarea { resize: vertical; min-height: 72px; }
 
 .mt { font-size: 17px; font-weight: 700; margin-bottom: 1.25rem; font-family: 'Heebo', sans-serif; }
 
-.prog { background: #f3f4f6; border-radius: 3px; height: 4px; overflow: hidden; flex: 1; }
-.pf { height: 100%; border-radius: 3px; transition: width .4s; }
+.prog { background: var(--s2); border-radius: 99px; height: 6px; overflow: hidden; flex: 1; }
+.pf { height: 100%; border-radius: 99px; transition: width .5s cubic-bezier(.4,0,.2,1); }
 
 .av-sm {
   width: 36px; height: 36px;
@@ -517,7 +524,9 @@ textarea { resize: vertical; min-height: 72px; }
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(16,24,40,0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 200;
   align-items: center;
   justify-content: center;
@@ -526,9 +535,10 @@ textarea { resize: vertical; min-height: 72px; }
 }
 .modal-bg.open { display: flex; }
 .modal {
-  background: rgba(11,17,28,0.98);
-  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  border: none;
   border-radius: var(--rxl);
+  box-shadow: var(--shadow-lg);
   padding: 1.75rem;
   width: 100%;
   max-width: 480px;
@@ -616,10 +626,11 @@ textarea { resize: vertical; min-height: 72px; }
 /* ── TICKER ── */
 .ticker-banner {
   background: #ffffff;
-  border-bottom: 1px solid var(--b);
-  height: 40px;
+  border-bottom: 1px solid rgba(16,24,40,0.05);
+  height: 38px;
   overflow: hidden;
   flex-shrink: 0;
+  opacity: .92;
 }
 
 /* ── PROFILE PIC ── */
@@ -1115,9 +1126,12 @@ textarea { resize: vertical; min-height: 72px; }
     <div id="a-students-list"><div style="font-size:13px;color:var(--m)">טוען...</div></div>
   </div>
 
-  <div class="card" style="margin-top:1rem">
-    <div class="ct"><i class="ti ti-refresh"></i> עדכון קבוצתי — לפי סוג + מחזור</div>
-    <div style="font-size:13px;color:var(--m);margin-bottom:12px">בחר קבוצת תלמידים ועדכן שדות לכולם בבת אחת. שדות ריקים לא ישתנו.</div>
+  <details class="card" style="margin-top:1rem">
+    <summary style="cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;list-style:none;user-select:none">
+      <i class="ti ti-refresh" style="color:var(--green)"></i> עדכון קבוצתי — לפי סוג + מחזור
+      <i class="ti ti-chevron-down" style="margin-right:auto;color:var(--h)"></i>
+    </summary>
+    <div style="font-size:13px;color:var(--m);margin:12px 0">בחר קבוצת תלמידים ועדכן שדות לכולם בבת אחת. שדות ריקים לא ישתנו.</div>
     <div class="tgrid">
       <div class="fr"><label class="fl">סוג תלמיד</label>
         <select id="bu-type" style="direction:rtl" onchange="window.updateBulkCount()">
@@ -1149,7 +1163,7 @@ textarea { resize: vertical; min-height: 72px; }
     </div>
     <div class="fr"><label class="fl">תוקף שיעורים</label><input type="date" id="bu-lessons-expiry"></div>
     <button class="btn btn-gold" onclick="window.runBulkUpdate()"><i class="ti ti-refresh"></i> עדכן קבוצה</button>
-  </div>
+  </details>
 </div>
 
 <!-- PENDING USERS -->
@@ -1526,9 +1540,9 @@ textarea { resize: vertical; min-height: 72px; }
 <div id="sp-lessons" class="page">
   <div class="ph"><div><div class="ph-h">השיעורים שלי</div></div></div>
   <div class="g3" style="margin-bottom:1.25rem" id="s-lessons-metrics"></div>
-  <div style="font-size:10px;font-weight:600;color:var(--h);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">שיעורים קרובים</div>
+  <div style="font-size:12px;font-weight:700;color:var(--m);letter-spacing:.01em;margin-bottom:8px">שיעורים קרובים</div>
   <div id="s-upcoming-list"><div style="font-size:13px;color:var(--m)">טוען...</div></div>
-  <div style="font-size:10px;font-weight:600;color:var(--h);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 8px">היסטוריה</div>
+  <div style="font-size:12px;font-weight:700;color:var(--m);letter-spacing:.01em;margin:16px 0 8px">היסטוריה</div>
   <div class="card" id="s-history-list"><div style="font-size:13px;color:var(--m)">טוען...</div></div>
 </div>
 
@@ -2336,7 +2350,7 @@ window.openStudentEdit = async uid => {
       </div>
     </div>
     <div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--b)">
-      <div style="font-size:10px;font-weight:600;color:var(--h);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">היסטוריית מנטורים</div>
+      <div style="font-size:12px;font-weight:700;color:var(--m);letter-spacing:.01em;margin-bottom:8px">היסטוריית מנטורים</div>
       <div id="mentor-history-view-${uid}" style="font-size:12px;color:var(--m)">
         ${buildMentorHistory(s)}
       </div>
@@ -3177,7 +3191,7 @@ window.toggleIntakeView = async id => {
     {label:'ציפיות',val:d.expectations},
     {label:'הערות',val:d.extra},
   ].filter(f=>f.val && f.val !== 'none' && f.val !== 'undefined' && f.val !== '');
-  el.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--gold);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">שאלון קבלה</div>' +
+  el.innerHTML = '<div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">שאלון קבלה</div>' +
     fields.map(f=>`<div style="display:flex;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--b);font-size:12px"><span style="color:var(--m);min-width:90px;flex-shrink:0">${f.label}</span><span>${f.val}</span></div>`).join('')+
     (d.age?`<div style="display:flex;gap:8px;padding:5px 0;font-size:12px"><span style="color:var(--m);min-width:90px">גיל</span><span>${d.age}</span></div>`:'');
 };
@@ -3253,7 +3267,7 @@ window.openSummaryDetail = (idx) => {
       <div style="font-size:13px;color:var(--t)">${s.hw}</div>
     </div>`:''}
     ${s.links?`<div>
-      <div style="font-size:11px;font-weight:600;color:var(--blue);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">קישורים וחומרים</div>
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px">קישורים וחומרים</div>
       ${s.links.split('\n').filter(l=>l.trim()).map(l=>`<a href="${l.trim()}" target="_blank" style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--blue);margin-bottom:6px;text-decoration:none;padding:7px 10px;background:var(--s2);border-radius:var(--r)"><i class="ti ti-external-link" style="font-size:13px;flex-shrink:0"></i>${l.trim()}</a>`).join('')}
     </div>`:''}
   `;
