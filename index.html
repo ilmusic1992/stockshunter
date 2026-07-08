@@ -2080,6 +2080,11 @@ onAuthStateChanged(auth, async user => {
         });
         newUser.used=0;
         try{ await updateDoc(doc(db,'roster',(user.email||'').toLowerCase()),{claimed:true,claimedAt:serverTimestamp(),claimedUid:user.uid}); }catch(e){}
+        // שיוך שיעורים שהוזמנו מהאתר לפני הכניסה הראשונה
+        try{
+          const lSnap=await getDocs(query(collection(db,'lessons'),where('studentEmail','==',(user.email||'').toLowerCase())));
+          await Promise.all(lSnap.docs.filter(d=>!d.data().studentId).map(d=>updateDoc(d.ref,{studentId:user.uid})));
+        }catch(e){}
       }
       if(user.photoURL) newUser.photoURL = user.photoURL;
       await setDoc(doc(db,'users',user.uid), newUser);
@@ -2827,12 +2832,20 @@ function initStudent(){
     renderHomeTasks();renderAllTasks();
   });
 
-  // Lessons
-  const u2=onSnapshot(query(collection(db,'lessons'),where('studentId','==',_me.uid)), snap=>{
-    const lessons=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  // Lessons — לפי uid וגם לפי אימייל (הזמנות מהאתר מגיעות עם אימייל בלבד)
+  let _lesA=[], _lesB=[];
+  const renderMyLessons=()=>{
+    const map={}; [..._lesA,..._lesB].forEach(l=>map[l.id]=l);
+    const lessons=Object.values(map).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
     renderStudentLessons(lessons);
     const next=lessons.find(l=>l.date>=new Date().toISOString().split('T')[0]);
     if(next)document.getElementById('s-next-label').innerHTML=`<span class="live"></span>שיעור הבא: ${next.date} · ${next.time||''}`;
+  };
+  const u2=onSnapshot(query(collection(db,'lessons'),where('studentId','==',_me.uid)), snap=>{
+    _lesA=snap.docs.map(d=>({id:d.id,...d.data()})); renderMyLessons();
+  });
+  const u2b=onSnapshot(query(collection(db,'lessons'),where('studentEmail','==',(_me.email||'').toLowerCase())), snap=>{
+    _lesB=snap.docs.map(d=>({id:d.id,...d.data()})); renderMyLessons();
   });
 
   // Portfolio
@@ -2853,7 +2866,7 @@ function initStudent(){
     renderStudentMessages(msgs);
   });
 
-  _unsubs.push(u1,u2,u3,u4,u5);
+  _unsubs.push(u1,u2,u2b,u3,u4,u5);
   renderHomeTasks();
 
   // Videos (static for now)
