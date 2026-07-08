@@ -1037,7 +1037,8 @@ textarea { resize: vertical; min-height: 72px; }
     <button class="ni" onclick="aPage('mentors',this)"><i class="ti ti-award"></i><span> מנטורים</span></button>
     <button class="ni" onclick="openExam()"><i class="ti ti-brain"></i><span> מבחן רמה</span></button>
   </div>
-  <button id="admin-mentor-switch" class="btn btn-sm" style="display:none;margin-left:8px" onclick="switchToMentorView()"><i class="ti ti-award"></i> תצוגת מנטור</button>
+  <button id="admin-mentor-switch" class="btn btn-sm" style="display:none;margin-left:4px" onclick="switchToMentorView()"><i class="ti ti-award"></i> מנטור</button>
+  <button id="admin-student-switch" class="btn btn-sm" style="display:none;margin-left:8px" onclick="switchToStudentView()"><i class="ti ti-user"></i> תלמיד</button>
   <div class="av" style="background:var(--pbg);color:var(--purple);border-color:rgba(124,58,237,.3)" id="av-admin" onclick="window.openProfilePicModal()" title="עדכן תמונת פרופיל"></div>
 </div>
 <div class="ticker-banner" id="tv-ticker-admin">
@@ -2175,7 +2176,9 @@ function initAdmin() {
   showScreen('sc-admin');
   // מתג תצוגת מנטור לאדמין שהוא גם מנטור
   const sw=document.getElementById('admin-mentor-switch');
-  if(sw) sw.style.display = _me.mentorAlso ? 'inline-flex' : 'none';
+  if(sw) sw.style.display = 'inline-flex';
+  const sw2=document.getElementById('admin-student-switch');
+  if(sw2) sw2.style.display = 'inline-flex';
   document.getElementById('av-admin').textContent = initials(_me.name);
   setTimeout(updateAllAvatars, 100);
   document.getElementById('a-greet').textContent = 'שלום, '+(_me.name||'');
@@ -2488,6 +2491,7 @@ window.runBulkUpdate = async () => {
 
 window.switchToMentorView = () => { _unsubs.forEach(u=>u&&u()); _unsubs=[]; initMentor(); };
 window.switchToAdminView = () => { _unsubs.forEach(u=>u&&u()); _unsubs=[]; initAdmin(); };
+window.switchToStudentView = () => { _unsubs.forEach(u=>u&&u()); _unsubs=[]; initStudent(); };
 
 window.aPage = (n,el) => {
   document.querySelectorAll('#sc-admin .page').forEach(p=>p.classList.remove('active'));
@@ -3053,6 +3057,8 @@ window.mPage=(n,el)=>{
 // ── STUDENT ───────────────────────────────────────
 function initStudent(){
   showScreen('sc-student');
+  const backBtn=document.getElementById('student-admin-switch');
+  if(backBtn) backBtn.style.display=(_me.role==='admin')?'inline-flex':'none';
   document.getElementById('av-student').textContent=initials(_me.name);
   setTimeout(renderTicker,200);
   document.getElementById('s-greet').textContent='שלום, '+(_me.name||'')+ ' 👋';
