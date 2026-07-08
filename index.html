@@ -1057,11 +1057,11 @@ textarea { resize: vertical; min-height: 72px; }
   </div>
   <div id="a-alert"></div>
   <div class="g5" id="a-metrics">
-    <div class="metric"><div class="ml">סה"כ תלמידים</div><div class="mv va" id="m-total">—</div></div>
+    <div class="metric"><div class="ml">סה"כ תלמידים</div><div class="mv" id="m-total">—</div></div>
     <div class="metric"><div class="ml">תלמידי קורסים</div><div class="mv vb" id="m-course">—</div></div>
     <div class="metric"><div class="ml">ליווי אישי</div><div class="mv vg" id="m-escort">—</div></div>
     <div class="metric"><div class="ml">מנטורים</div><div class="mv" id="m-mentors">—</div></div>
-    <div class="metric"><div class="ml">ממתינים לאישור</div><div class="mv vr" id="m-pending">—</div></div>
+    <div class="metric"><div class="ml">ממתינים לאישור</div><div class="mv" id="m-pending">—</div></div>
   </div>
   <div class="g2">
     <div class="card"><div class="ct"><i class="ti ti-alert-triangle"></i> מנויים קרובים לפוג</div><div id="a-expiring"><div style="font-size:13px;color:var(--m)">טוען...</div></div></div>
@@ -2133,7 +2133,7 @@ function initAdmin() {
     document.getElementById('m-course').textContent = _allStudents.filter(s=>s.type==='stocks-course'||s.type==='futures-course').length;
     document.getElementById('m-escort').textContent = _allStudents.filter(s=>s.type==='personal').length;
     document.getElementById('m-mentors').textContent = _allMentors.length;
-    document.getElementById('m-pending').textContent = pending.length;
+    const mp=document.getElementById('m-pending'); mp.textContent = pending.length; mp.className = 'mv '+(pending.length>0?'vr':'');
     document.getElementById('pending-badge').textContent = pending.length>0?' ('+pending.length+')':'';
     renderStudentList(); renderMentorList(); renderPendingList(pending.map(d=>({id:d.id,...d.data()})));
     renderExpiring(); renderDist(); populateMentorDropdowns(); renderAdminWAReminders(); renderActionRequired(); if(typeof window.updateBCPreview==="function") window.updateBCPreview();
