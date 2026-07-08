@@ -1275,6 +1275,16 @@ textarea { resize: vertical; min-height: 72px; }
         <button class="btn btn-gold" onclick="window.saveWALinks()"><i class="ti ti-check"></i> שמור</button>
       </div>
       <div class="card">
+        <div class="ct"><i class="ti ti-tool"></i> ניהול כלים (קישורים חיצוניים)</div>
+        <div style="font-size:13px;color:var(--m);margin-bottom:10px">מה שמופיע לתלמידים בטאב "כלים"</div>
+        <div id="admin-tools-list"></div>
+      </div>
+      <div class="card">
+        <div class="ct"><i class="ti ti-video"></i> ניהול ספריית השיעורים</div>
+        <div style="font-size:13px;color:var(--m);margin-bottom:10px">שיעורים מוקלטים + מונה צפיות</div>
+        <div id="admin-library-list"></div>
+      </div>
+      <div class="card">
         <div class="ct"><i class="ti ti-sparkles"></i> מפתח AI (Anthropic)</div>
         <div style="font-size:13px;color:var(--m);margin-bottom:12px">נדרש לכפתורי "AI draft" בתפוצה ובטיפ היומי. המפתח נשמר ב-Firestore וזמין רק לצוות.</div>
         <div class="fr"><label class="fl">API Key</label><input type="password" id="ai-key" placeholder="sk-ant-..." dir="ltr"></div>
@@ -1466,8 +1476,8 @@ textarea { resize: vertical; min-height: 72px; }
     <button class="ni active" onclick="sPage('home',this)"><i class="ti ti-home"></i><span> ראשי</span></button>
     <button class="ni" onclick="sPage('lessons',this)"><i class="ti ti-calendar"></i><span> שיעורים</span></button>
     <button class="ni" onclick="sPage('homework',this)"><i class="ti ti-checklist"></i><span> משימות</span></button>
-    <button class="ni" onclick="sPage('trading',this)"><i class="ti ti-chart-candle"></i><span> מסחר</span></button>
-    <button class="ni" onclick="sPage('events',this)"><i class="ti ti-calendar-event"></i><span> אירועים</span></button>
+    <button class="ni" onclick="sPage('trading',this)"><i class="ti ti-chart-candle"></i><span> יומן מסחר</span></button>
+    <button class="ni" onclick="sPage('events',this)"><i class="ti ti-calendar-event"></i><span> לוז וובינרים</span></button>
     <button class="ni" onclick="sPage('tools',this)"><i class="ti ti-tool"></i><span> כלים</span></button>
   </div>
   <button id="student-admin-switch" class="btn btn-sm" style="display:none;margin-left:8px" onclick="switchToAdminView()"><i class="ti ti-layout-dashboard"></i> חזרה לניהול</button>
@@ -1622,7 +1632,7 @@ textarea { resize: vertical; min-height: 72px; }
 </div>
 <!-- EVENTS -->
 <div id="sp-events" class="page">
-  <div class="ph"><div><div class="ph-h">לוז ואירועים</div><div class="ph-s">וובינרים ואירועים קרובים</div></div></div>
+  <div class="ph"><div><div class="ph-h">לוז וובינרים</div><div class="ph-s">וובינרים ואירועים קרובים</div></div></div>
   <div class="card" style="padding:0;overflow:hidden;border-radius:var(--rl)">
     <iframe
       src="https://www.stockshunter.co.il/%D7%95%D7%95%D7%91%D7%99%D7%A0%D7%A8%D7%99%D7%9D"
@@ -1888,7 +1898,7 @@ textarea { resize: vertical; min-height: 72px; }
   <nav class="bottom-nav" id="student-bottom-nav">
     <button class="bn-item active" onclick="sPage('home',null);setBN(this,'student-bottom-nav')"><i class="ti ti-home"></i><span>ראשי</span></button>
     <button class="bn-item" onclick="sPage('lessons',null);setBN(this,'student-bottom-nav')"><i class="ti ti-calendar"></i><span>שיעורים</span></button>
-    <button class="bn-item" onclick="sPage('trading',null);setBN(this,'student-bottom-nav')"><i class="ti ti-chart-candle"></i><span>מסחר</span></button>
+    <button class="bn-item" onclick="sPage('trading',null);setBN(this,'student-bottom-nav')"><i class="ti ti-chart-candle"></i><span>יומן מסחר</span></button>
     <button class="bn-item" onclick="sPage('homework',null);setBN(this,'student-bottom-nav')"><i class="ti ti-checklist"></i><span>משימות</span></button>
     <button class="bn-item" onclick="sPage('tools',null);setBN(this,'student-bottom-nav')"><i class="ti ti-tool"></i><span>כלים</span></button>
   </nav>
@@ -2615,6 +2625,10 @@ window.selCRM = id => {
       <div style="font-size:10px;color:var(--h);margin-bottom:1px">סטטוס קצב</div>
       <div style="font-size:13px;font-weight:600;color:${statusC}">${statusL}</div>
     </div>
+    ${s.lastExamScore!==undefined?`<div style="background:var(--bbg);border-radius:var(--r);padding:9px 12px;margin-bottom:12px;border-right:2px solid var(--blue)">
+      <div style="font-size:10px;color:var(--h);margin-bottom:1px">🧠 מבחן רמה</div>
+      <div style="font-size:13px;font-weight:600">אחרון: ${s.lastExamScore}/10 · הכי טוב: ${s.bestExamScore||s.lastExamScore}/10${s.lastExamDate?` · ${s.lastExamDate}`:''}</div>
+    </div>`:''}
     ${s.lastTopics?`<div style="font-size:11px;color:var(--h);margin-bottom:4px">שיעור אחרון: ${s.lastLesson||'—'}</div>
     <div style="font-size:13px;margin-bottom:12px">${s.lastTopics}</div>`:''}
     ${s.lastHw?`<div style="font-size:11px;color:var(--h);margin-bottom:4px">שיעורי בית שניתנו</div>
@@ -2737,20 +2751,37 @@ window.renderLibraryInline = async function(){
       <div style="flex:1"><div style="font-size:13.5px;font-weight:600">${v.title||'שיעור'}</div>
       ${staff?`<div style="font-size:11px;color:var(--h)">👁 ${v.views||0} צפיות</div>`:''}</div>
       <i class="ti ti-chevron-left" style="color:var(--h)"></i>
-    </div>`).join(''):'<div style="font-size:13px;color:var(--m);text-align:center;padding:10px">הספרייה ריקה — שיעורים מוקלטים יופיעו כאן</div>')
-    +(staff?`<div style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap">
-      <input type="text" id="libi-title" placeholder="שם השיעור" style="flex:2;min-width:110px">
-      <input type="text" id="libi-url" placeholder="קישור YouTube / Vimeo" dir="ltr" style="flex:3;min-width:150px">
-      <button class="btn btn-gold btn-sm" onclick="addLibraryInline()"><i class="ti ti-plus"></i></button>
-    </div>`:'');
+    </div>`).join(''):'<div style="font-size:13px;color:var(--m);text-align:center;padding:10px">שיעורים מוקלטים יופיעו כאן בקרוב</div>');
 };
-window.addLibraryInline = async () => {
-  const title=document.getElementById('libi-title')?.value?.trim();
-  const url=document.getElementById('libi-url')?.value?.trim();
+
+// ניהול ספרייה — בהגדרות האדמין בלבד
+window.renderLibraryAdmin = async function(){
+  const el=document.getElementById('admin-library-list'); if(!el)return;
+  _library=null; await loadLibraryOnce();
+  el.innerHTML=(_library.length?_library.map(v=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--b)">
+      <i class="ti ti-player-play" style="color:var(--red);font-size:13px"></i>
+      <span style="font-size:13px;font-weight:600;flex:1">${v.title}</span>
+      <span style="font-size:11px;color:var(--h)">👁 ${v.views||0}</span>
+      <button class="btn btn-sm btn-danger" onclick="delLibraryAdmin('${v.id}')"><i class="ti ti-trash" style="font-size:11px"></i></button>
+    </div>`).join(''):'<div style="font-size:13px;color:var(--m)">הספרייה ריקה</div>')
+  +`<div style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap">
+      <input type="text" id="alib-title" placeholder="שם השיעור" style="flex:2;min-width:110px">
+      <input type="text" id="alib-url" placeholder="קישור YouTube / Vimeo" dir="ltr" style="flex:3;min-width:150px">
+      <button class="btn btn-gold btn-sm" onclick="addLibraryAdmin()"><i class="ti ti-plus"></i> הוסף</button>
+    </div>`;
+};
+window.addLibraryAdmin = async () => {
+  const title=document.getElementById('alib-title')?.value?.trim();
+  const url=document.getElementById('alib-url')?.value?.trim();
   if(!title||!url){showToast('מלא שם וקישור');return;}
-  const ref=await addDoc(collection(db,'library'),{title,url,views:0,addedBy:_me.uid,createdAt:serverTimestamp()});
-  _library.push({id:ref.id,title,url,views:0});
-  renderLibraryInline(); showToast('נוסף לספרייה ✓');
+  await addDoc(collection(db,'library'),{title,url,views:0,addedBy:_me.uid,createdAt:serverTimestamp()});
+  renderLibraryAdmin(); showToast('נוסף לספרייה ✓');
+};
+window.delLibraryAdmin = async id => {
+  if(!confirm('להסיר מהספרייה?'))return;
+  await deleteDoc(doc(db,'library',id));
+  renderLibraryAdmin(); showToast('הוסר');
 };
 
 window.openPlayer = async id => {
@@ -2779,31 +2810,9 @@ function renderLibrary(){
   el.innerHTML=(_library.length?_library.map(v=>`
     <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--b)">
       <div style="width:34px;height:26px;border-radius:6px;background:var(--rbg);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-player-play" style="color:var(--red);font-size:14px"></i></div>
-      <a onclick="closeModal('m-library');openPlayer('${v.id}')" style="flex:1;font-size:13px;font-weight:600;color:var(--t);text-decoration:none;cursor:pointer">${v.title||'שיעור'} <span style="font-size:10px;color:var(--h)">· 👁 ${v.views||0}</span></a>
-      ${v.cat?`<span class="badge bb">${v.cat}</span>`:''}
-      ${staff?`<button class="btn btn-sm btn-danger" onclick="delLibraryItem('${v.id}')"><i class="ti ti-trash" style="font-size:11px"></i></button>`:''}
-    </div>`).join(''):'<div style="font-size:13px;color:var(--m);padding:8px 0">הספרייה ריקה — הוסיפו שיעורים מוקלטים</div>')
-    +(staff?`<div style="display:flex;gap:7px;margin-top:14px;flex-wrap:wrap">
-      <input type="text" id="lib-title" placeholder="שם השיעור" style="flex:2;min-width:120px">
-      <input type="text" id="lib-url" placeholder="https://..." dir="ltr" style="flex:3;min-width:150px">
-      <button class="btn btn-gold btn-sm" onclick="addLibraryItem()"><i class="ti ti-plus"></i> הוסף</button>
-    </div>`:'');
+      <a onclick="closeModal('m-library');openPlayer('${v.id}')" style="flex:1;font-size:13px;font-weight:600;color:var(--t);text-decoration:none;cursor:pointer">${v.title||'שיעור'}${staff?` <span style="font-size:10px;color:var(--h)">· 👁 ${v.views||0}</span>`:''}</a>
+    </div>`).join(''):'<div style="font-size:13px;color:var(--m);padding:8px 0">הספרייה ריקה</div>');
 }
-window.addLibraryItem = async () => {
-  const title=document.getElementById('lib-title')?.value?.trim();
-  const url=document.getElementById('lib-url')?.value?.trim();
-  if(!title||!url){showToast('מלא שם וקישור');return;}
-  const ref=await addDoc(collection(db,'library'),{title,url,addedBy:_me.uid,createdAt:serverTimestamp()});
-  _library.push({id:ref.id,title,url});
-  renderLibrary(); showToast('נוסף לספרייה ✓');
-};
-window.delLibraryItem = async id => {
-  if(!confirm('להסיר מהספרייה?'))return;
-  await deleteDoc(doc(db,'library',id));
-  _library=_library.filter(x=>x.id!==id);
-  renderLibrary();
-};
-
 function renderSchedule(){
   const el=document.getElementById('m-sched-grid');if(!el)return;
   const days=['א','ב','ג','ד','ה','ו'];
@@ -3353,35 +3362,39 @@ async function loadTools(force){
 window.renderTools = async function(){
   const el=document.getElementById('tools-groups'); if(!el)return;
   await loadTools();
-  const isAdm=_me.role==='admin';
   const groups={};
   _tools.forEach(t=>{ (groups[t.group||'כללי']=groups[t.group||'כללי']||[]).push(t); });
   let html=Object.entries(groups).map(([g,items])=>`
     <div style="font-size:14px;font-weight:700;margin:18px 0 10px">${g}</div>
-    ${items.map(l=>`<div class="card" style="display:flex;align-items:center;gap:12px;padding:15px 18px;margin-bottom:8px">
+    ${items.map(l=>`<a href="${l.url}" target="_blank" rel="noopener" class="card" style="display:flex;align-items:center;gap:12px;padding:15px 18px;margin-bottom:8px;text-decoration:none;color:var(--t)">
       <i class="ti ti-external-link" style="color:var(--m);font-size:16px"></i>
-      <a href="${l.url}" target="_blank" rel="noopener" style="font-size:14px;font-weight:600;flex:1;color:var(--t);text-decoration:none">${l.name}</a>
-      ${isAdm?`<button class="btn btn-sm" onclick="editTool('${l.id}')"><i class="ti ti-pencil" style="font-size:11px"></i></button>
-      <button class="btn btn-sm btn-danger" onclick="delTool('${l.id}')"><i class="ti ti-trash" style="font-size:11px"></i></button>`
-      :'<i class="ti ti-chevron-left" style="color:var(--h)"></i>'}
-    </div>`).join('')}`).join('');
-  if(!_tools.length) html='<div class="card" style="text-align:center;color:var(--m);font-size:13px;padding:24px">אין כלים עדיין</div>';
-  if(isAdm){
-    html+=`<div class="card" style="margin-top:18px">
-      <div class="ct"><i class="ti ti-plus"></i> הוספת כלי</div>
-      <div class="tgrid">
-        <div class="fr"><label class="fl">קבוצה</label><input type="text" id="tool-group" placeholder="למשל: יומן מסחר" list="tool-groups-list">
-          <datalist id="tool-groups-list">${Object.keys(groups).map(g=>`<option value="${g}">`).join('')}</datalist></div>
-        <div class="fr"><label class="fl">שם</label><input type="text" id="tool-name" placeholder="שם הכלי"></div>
-      </div>
-      <div class="fr"><label class="fl">קישור</label><input type="text" id="tool-url" placeholder="https://..." dir="ltr"></div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-gold btn-sm" onclick="addTool()"><i class="ti ti-plus"></i> הוסף</button>
-        ${!_tools.length?`<button class="btn btn-sm" onclick="seedTools()"><i class="ti ti-download"></i> טען רשימת ברירת מחדל</button>`:''}
-      </div>
-    </div>`;
-  }
+      <span style="font-size:14px;font-weight:600;flex:1">${l.name}</span>
+      <i class="ti ti-chevron-left" style="color:var(--h)"></i>
+    </a>`).join('')}`).join('');
+  if(!_tools.length) html='<div class="card" style="text-align:center;color:var(--m);font-size:13px;padding:24px">הכלים יתעדכנו בקרוב</div>';
   el.innerHTML=html;
+};
+
+// ניהול כלים — בהגדרות האדמין בלבד
+window.renderToolsAdmin = async function(){
+  const el=document.getElementById('admin-tools-list'); if(!el)return;
+  await loadTools(true);
+  el.innerHTML=(_tools.length?_tools.map(l=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--b)">
+      <span class="badge bb">${l.group||'כללי'}</span>
+      <span style="font-size:13px;font-weight:600;flex:1">${l.name}</span>
+      <button class="btn btn-sm" onclick="editTool('${l.id}')"><i class="ti ti-pencil" style="font-size:11px"></i></button>
+      <button class="btn btn-sm btn-danger" onclick="delTool('${l.id}')"><i class="ti ti-trash" style="font-size:11px"></i></button>
+    </div>`).join(''):'<div style="font-size:13px;color:var(--m)">אין כלים עדיין</div>')
+  +`<div class="tgrid" style="margin-top:12px">
+      <div class="fr"><label class="fl">קבוצה</label><input type="text" id="tool-group" placeholder="למשל: יומן מסחר"></div>
+      <div class="fr"><label class="fl">שם</label><input type="text" id="tool-name" placeholder="שם הכלי"></div>
+    </div>
+    <div class="fr"><label class="fl">קישור</label><input type="text" id="tool-url" placeholder="https://..." dir="ltr"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-gold btn-sm" onclick="addTool()"><i class="ti ti-plus"></i> הוסף כלי</button>
+      ${!_tools.length?`<button class="btn btn-sm" onclick="seedTools()"><i class="ti ti-download"></i> טען רשימת ברירת מחדל</button>`:''}
+    </div>`;
 };
 
 window.addTool = async () => {
@@ -3390,7 +3403,7 @@ window.addTool = async () => {
   const url=document.getElementById('tool-url')?.value?.trim();
   if(!name||!url){showToast('מלא שם וקישור');return;}
   await addDoc(collection(db,'tools'),{group,name,url,order:(_tools.length?Math.max(..._tools.map(t=>t.order||0)):0)+1,createdAt:serverTimestamp()});
-  await loadTools(true); renderTools(); showToast('כלי נוסף ✓');
+  await loadTools(true); renderTools(); renderToolsAdmin(); showToast('כלי נוסף ✓');
 };
 window.editTool = async id => {
   const t=_tools.find(x=>x.id===id); if(!t)return;
@@ -3398,16 +3411,16 @@ window.editTool = async id => {
   const url=prompt('קישור:',t.url); if(url===null)return;
   const group=prompt('קבוצה:',t.group); if(group===null)return;
   await updateDoc(doc(db,'tools',id),{name:name.trim(),url:url.trim(),group:group.trim()});
-  await loadTools(true); renderTools(); showToast('עודכן ✓');
+  await loadTools(true); renderTools(); renderToolsAdmin(); showToast('עודכן ✓');
 };
 window.delTool = async id => {
   if(!confirm('למחוק את הכלי?'))return;
   await deleteDoc(doc(db,'tools',id));
-  await loadTools(true); renderTools(); showToast('נמחק');
+  await loadTools(true); renderTools(); renderToolsAdmin(); showToast('נמחק');
 };
 window.seedTools = async () => {
   for(const t of TOOLS_SEED) await addDoc(collection(db,'tools'),{...t,createdAt:serverTimestamp()});
-  await loadTools(true); renderTools(); showToast('נטענה רשימת ברירת המחדל ✓');
+  await loadTools(true); renderTools(); renderToolsAdmin(); showToast('נטענה רשימת ברירת המחדל ✓');
 };
 
 // ── SHARED UI ─────────────────────────────────────
@@ -4121,7 +4134,7 @@ window.saveWALinks = async () => {
 const _aPageOrig2 = window.aPage;
 window.aPage = (n, el) => {
   _aPageOrig2(n, el);
-  if(n==='settings') { loadSettingsPage(); renderCohortsSettings(); }
+  if(n==='settings') { loadSettingsPage(); renderCohortsSettings(); renderToolsAdmin(); renderLibraryAdmin(); }
   if(n==='students') fillBulkCohorts();
 };
 
@@ -4348,8 +4361,7 @@ let _examIdx = 0;
 let _examScore = 0;
 let _examAnswered = false;
 
-window.openExam = () => { window.open('https://stock-hunter-game.vercel.app/','_blank','noopener'); };
-window._openExamLegacy = () => {
+window.openExam = () => {
   // Update logo
   const li = document.getElementById('logo-exam');
   if(li) li.src = LOGO;
